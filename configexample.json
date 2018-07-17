@@ -1,0 +1,10 @@
+{
+  "bot": {
+    "owner": [""],
+    "token": ""
+  },
+
+  "guild": {
+    "defaultPrefix": "."
+  }
+}
