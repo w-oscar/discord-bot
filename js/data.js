@@ -1,3 +1,4 @@
+var commands = [ ]
 var consoleLog = true
 
-module.exports = { consoleLog }
+module.exports = { commands, consoleLog }

@@ -7,3 +7,5 @@ process.on('unhandledRejection', err => console.error(`Uncaught Promise Error: \
 
 require('./js/util').start()
 require('./js/eventLoader')(client)
+
+// NICKNAMES !!!
