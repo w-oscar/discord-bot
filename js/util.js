@@ -75,10 +75,8 @@ function checkTarget (message, phrase) {
           let replyMessage = caughtMessages[0]
           let c = replyMessage.content
 
-          if (!isNaN(c)) reject(translateMessage('en', 'findTargetInvalidResponse'))
+          if (isNaN(c)) reject(translateMessage('en', 'findTargetInvalidResponse'))
           let int = parseInt(c)
-
-          console.log(c)
 
           if (int > members.length || int < 0) reject(translateMessage('en', 'findTargetInvalidResponse'))
           resolve(members[int])
@@ -88,7 +86,7 @@ function checkTarget (message, phrase) {
         }
       } catch (e) {
         // console.log(e)
-      }reject(translateMessage('en', 'findTargetInvalidResponse'))
+      }
     } else {
 
     }
