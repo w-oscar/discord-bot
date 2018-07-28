@@ -9,16 +9,16 @@ module.exports = {
 
     botAccess: [],
     userAccess: ['MANAGE_MESSAGES'],
-    channelType: ['text', 'dm'],
+    channelType: ['text'],
 
     execute: async (message, args) => {
-      let target = message.author
+      let target = message.member
       try {
         if (args[0]) target = await util.checkTarget(message, args[0])
 
-        message.channel.send(`Target: ${target.user.username}`)
+        util.successReply(message, '', `Found: ${target.user.username}`)
       } catch (e) {
-        message.channel.send(`Error: ${e}`)
+        util.errorReply(message, '', e)
       }
     }
   }

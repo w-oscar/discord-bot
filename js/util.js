@@ -1,3 +1,4 @@
+const Discord = require('discord.js')
 const fs = require('fs')
 const path = require('path')
 
@@ -60,26 +61,26 @@ function checkTarget (message, phrase) {
         let members = guildMembers.filter((guildMember) => guildMember.displayName.toLowerCase().includes(phrase.toLowerCase())).array()
 
         if (members.length > 1) {
-          let sendMessage = `${translateMessage('en', 'findTargetMultiple')}\`\`\``
+          let sendMessage = `\`\`\``
 
           for (let i = 0; i < members.length || i > 6; i++) {
             sendMessage += `\n${i} | ${members[i].displayName} (${members[i].user.tag}) [${members[i].id}]`
           }
 
           sendMessage += `\`\`\``
-          await message.channel.send(sendMessage)
+          await successReply(message, sendMessage, translateMessage('en', 'findTargetMultiple'))
 
           let caughtMessages = await message.channel.awaitMessages((m) => m.author === message.author, { maxMatches: 1, time: 15000, errors: ['time'] })
-          caughtMessages = caughtMessages.array()
+          let caughtMessage = caughtMessages.array()
+          let c = caughtMessage[0].content
 
-          let replyMessage = caughtMessages[0]
-          let c = replyMessage.content
+          if (isNaN(c)) return reject(translateMessage('en', 'findTargetInvalidResponse'))
 
-          if (isNaN(c)) reject(translateMessage('en', 'findTargetInvalidResponse'))
           let int = parseInt(c)
 
-          if (int > members.length || int < 0) reject(translateMessage('en', 'findTargetInvalidResponse'))
-          resolve(members[int])
+          if (int > members.length || int < 0) return reject(translateMessage('en', 'findTargetInvalidResponse'))
+
+          return resolve(members[int])
         } else {
           if (members.length === 0) reject(translateMessage('en', 'findTargetNoneFound'))
           if (members.length === 1) resolve(members[0])
@@ -104,4 +105,42 @@ function translateMessage (language, phrase) {
   return languageFile[phrase]
 }
 
-module.exports = { start, loadCommands, tryLogToConsole, checkTarget, translateMessage }
+function successReply (message, reply, embed = null) {
+  return new Promise(async (resolve, reject) => {
+    if (message.channel.type === 'text' && !message.channel.guild.member(index.client.user).permissionsIn(message.channel).has('SEND_MESSAGES')) return reject()
+
+    if (embed) {
+      if (message.channel.type === 'text' && !message.channel.guild.member(index.client.user).permissionsIn(message.channel).has('EMBED_LINKS')) return resolve(await message.channel.send(reply))
+
+      let rE = new Discord.RichEmbed()
+      rE.setColor('GREEN')
+      rE.setFooter(message.author.tag, message.author.avatarURL)
+      rE.setDescription(embed)
+
+      return resolve(await message.channel.send(reply, rE))
+    }
+
+    return resolve(await message.channel.send(reply))
+  })
+}
+
+function errorReply (message, reply, embed = null) {
+  return new Promise(async (resolve, reject) => {
+    if (message.channel.type === 'text' && !message.channel.guild.member(index.client.user).permissionsIn(message.channel).has('SEND_MESSAGES')) return reject()
+
+    if (embed) {
+      if (message.channel.type === 'text' && !message.channel.guild.member(index.client.user).permissionsIn(message.channel).has('EMBED_LINKS')) return resolve(await message.channel.send(reply))
+
+      let rE = new Discord.RichEmbed()
+      rE.setColor('RED')
+      rE.setFooter(message.author.tag, message.author.avatarURL)
+      rE.setDescription(embed)
+
+      return resolve(await message.channel.send(reply, rE))
+    }
+
+    return resolve(await message.channel.send(reply))
+  })
+}
+
+module.exports = { start, loadCommands, tryLogToConsole, checkTarget, translateMessage, successReply, errorReply }
