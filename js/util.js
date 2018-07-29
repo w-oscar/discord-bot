@@ -46,7 +46,7 @@ function tryLogToConsole (type, value) {
   }
 }
 
-function checkTarget (message, phrase) {
+function checkTarget (message, phrase, glob = false) {
   return new Promise(async (resolve, reject) => {
     if (phrase.startsWith('<@')) {
       phrase = phrase.replace('!', '')
@@ -56,10 +56,10 @@ function checkTarget (message, phrase) {
     if (!isNaN(phrase)) {
       try {
         return resolve(await index.client.fetchUser(phrase))
-      } catch (e) { console.log(e) }
+      } catch (e) { }
     }
 
-    if (message.guild) {
+    if (message.guild && !glob) {
       try {
         let guildMembers = message.guild.members
 
@@ -123,7 +123,6 @@ function checkTarget (message, phrase) {
           if (users.length === 0) return reject(translateMessage('en', 'findTargetNoneFound'))
           return resolve(users[0])
         }
-
       } catch (e) { console.log(e) }
     }
   })
@@ -145,7 +144,7 @@ function successReply (message, reply, embed = null) {
       rE.setColor('GREEN')
       rE.setDescription(embed)
 
-      if (message.channel.type === 'text') rE.setFooter(`${translateMessage('en', 'requestedBy')} ${message.author.tag}`)
+      if (message.channel.type === 'text') rE.setFooter(`${translateMessage('en', 'requestedBy')} ${message.member.displayName}`)
       return resolve(await message.channel.send(reply, rE))
     }
 
@@ -164,7 +163,7 @@ function errorReply (message, reply, embed = null) {
       rE.setColor('RED')
       rE.setDescription(embed)
 
-      if (message.channel.type === 'text') rE.setFooter(`${translateMessage('en', 'requestedBy')} ${message.author.tag}`)
+      if (message.channel.type === 'text') rE.setFooter(`${translateMessage('en', 'requestedBy')} ${message.member.displayName}`)
       return resolve(await message.channel.send(reply, rE))
     }
 

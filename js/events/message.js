@@ -9,11 +9,6 @@ module.exports = async (message) => {
   checkCommand(message)
 
   util.tryLogToConsole(1, `${message.author.tag} -> ${message.content}`)
-
-  /* await util.checkTarget(message, message.content)
-  .then((guildMember) => message.channel.send(`Target: ${guildMember.user.username}`))
-  .catch((e) => message.channel.send(e))
-  */
 }
 
 function checkCommand (message) {
@@ -42,6 +37,7 @@ function checkCommand (message) {
   if (!args) return
 
   let checkArgs = args.join(' ').toLowerCase()
+  let flags = args.filter((arg) => arg.startsWith('-'))
 
   for (let command of data.commands) {
     for (let i = 0; i < command.command.aliases.length; i++) {
@@ -62,7 +58,7 @@ function checkCommand (message) {
           }
         }
 
-        command.command.execute(message, args.splice(command.command.aliases[i].split(/\s+/g).length, args.length - 1))
+        command.command.execute(message, args.splice(command.command.aliases[i].split(/\s+/g).length, args.length - 1), flags)
       }
     }
   }
