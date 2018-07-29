@@ -1,5 +1,10 @@
 {
-  "findTargetMultiple": "Multiple Targets Found! Choose with a number (15 Seconds)",
-  "findTargetNoneFound": "No-one has been found with your parameter",
-  "findTargetInvalidResponse": "Invalid response"
+  "findTargetMultiple": "Multiple target founds, reply with your choice",
+  "findTargetNoneFound": "No one has been found with your parameter",
+  "findTargetInvalidResponse": "Invalid response",
+
+  "requestedBy": "Requested by:",
+
+  "userInfoHeader": "**User Info**",
+  "userInfoUser": "**User:**"
 }

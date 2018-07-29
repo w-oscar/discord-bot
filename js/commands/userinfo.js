@@ -9,14 +9,14 @@ module.exports = {
 
     botAccess: [],
     userAccess: ['MANAGE_MESSAGES'],
-    channelType: ['text'],
+    channelType: ['text', 'dm'],
 
     execute: async (message, args) => {
       let target = message.author
       try {
         if (args[0]) target = await util.checkTarget(message, args[0])
 
-        util.successReply(message, '', `**User Info**\n\n**User:** ${target} (${target.tag}) [${target.id}]`)
+        util.successReply(message, '', `${util.translateMessage('en', 'userInfoHeader')}\n\n${util.translateMessage('en', 'userInfoUser')} ${target} (${target.tag}) [${target.id}]`)
       } catch (e) {
         util.errorReply(message, '', e)
       }
