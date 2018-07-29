@@ -1,4 +1,3 @@
-const Discord = require('discord.js')
 const fs = require('fs')
 const path = require('path')
 
@@ -53,6 +52,14 @@ function checkTarget (message, phrase) {
       phrase = phrase.slice(2).slice(0, -1)
     }
 
+    if (!isNaN(phrase)) {
+      try {
+        return resolve(await index.client.fetchUser(phrase))
+      } catch (e) {
+        return reject(translateMessage('en', 'findTargetNoneFound'))
+      }
+    }
+
     if (message.guild.available) {
       try {
         let guildMembers = message.guild.members
@@ -68,7 +75,7 @@ function checkTarget (message, phrase) {
           }
 
           sendMessage += `\`\`\``
-          await successReply(message, sendMessage, translateMessage('en', 'findTargetMultiple'))
+          await successReply(message, sendMessage, translateMessage('en', 'findTargetMultiple"'))
 
           let caughtMessages = await message.channel.awaitMessages((m) => m.author === message.author, { maxMatches: 1, time: 15000, errors: ['time'] })
           let caughtMessage = caughtMessages.array()
@@ -77,13 +84,12 @@ function checkTarget (message, phrase) {
           if (isNaN(c)) return reject(translateMessage('en', 'findTargetInvalidResponse'))
 
           let int = parseInt(c)
+          if (int > members.length - 1 || int < 0) return reject(translateMessage('en', 'findTargetInvalidResponse'))
 
-          if (int > members.length || int < 0) return reject(translateMessage('en', 'findTargetInvalidResponse'))
-
-          return resolve(members[int])
+          return resolve(members[int].user)
         } else {
-          if (members.length === 0) reject(translateMessage('en', 'findTargetNoneFound'))
-          if (members.length === 1) resolve(members[0])
+          if (members.length === 0) return reject(translateMessage('en', 'findTargetNoneFound'))
+          if (members.length === 1) return resolve(members[0].user)
         }
       } catch (e) {
         // console.log(e)
@@ -110,14 +116,17 @@ function successReply (message, reply, embed = null) {
     if (message.channel.type === 'text' && !message.channel.guild.member(index.client.user).permissionsIn(message.channel).has('SEND_MESSAGES')) return reject()
 
     if (embed) {
-      if (message.channel.type === 'text' && !message.channel.guild.member(index.client.user).permissionsIn(message.channel).has('EMBED_LINKS')) return resolve(await message.channel.send(reply))
+      if (message.channel.type === 'text' && !message.channel.guild.member(index.client.user).permissionsIn(message.channel).has('EMBED_LINKS')) return resolve(await message.channel.send(`${reply}\n${embed}`))
 
-      let rE = new Discord.RichEmbed()
-      rE.setColor('GREEN')
-      rE.setFooter(message.author.tag, message.author.avatarURL)
-      rE.setDescription(embed)
-
-      return resolve(await message.channel.send(reply, rE))
+      return resolve(await message.channel.send(reply, {
+        embed: {
+          color: 0x2ECC71,
+          description: embed,
+          footer: {
+            text: `To: ${message.author.tag}`
+          }
+        }
+      }))
     }
 
     return resolve(await message.channel.send(reply))
@@ -129,14 +138,17 @@ function errorReply (message, reply, embed = null) {
     if (message.channel.type === 'text' && !message.channel.guild.member(index.client.user).permissionsIn(message.channel).has('SEND_MESSAGES')) return reject()
 
     if (embed) {
-      if (message.channel.type === 'text' && !message.channel.guild.member(index.client.user).permissionsIn(message.channel).has('EMBED_LINKS')) return resolve(await message.channel.send(reply))
+      if (message.channel.type === 'text' && !message.channel.guild.member(index.client.user).permissionsIn(message.channel).has('EMBED_LINKS')) return resolve(await message.channel.send(`${reply}\n${embed}`))
 
-      let rE = new Discord.RichEmbed()
-      rE.setColor('RED')
-      rE.setFooter(message.author.tag, message.author.avatarURL)
-      rE.setDescription(embed)
-
-      return resolve(await message.channel.send(reply, rE))
+      return resolve(await message.channel.send(reply, {
+        embed: {
+          color: 0xE74C3C,
+          description: embed,
+          footer: {
+            text: `To: ${message.author.tag}`
+          }
+        }
+      }))
     }
 
     return resolve(await message.channel.send(reply))
